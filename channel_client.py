@@ -4,7 +4,6 @@ import threading
 import sys
 
 
-
 def client():
     host = 'localhost'
     port = 5000
