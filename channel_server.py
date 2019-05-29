@@ -91,7 +91,15 @@ def waiting_for_client(conn):
 def send_chat(conn):
     while True:
         # First get the data from client
-        json_data = conn.recv(1024).decode()
+        json_data = None
+        try:
+            json_data = conn.recv(1024).decode()
+        except:
+            print('Detect connection disconnection')
+            break
+        if json_data == None:
+            print('Detect no data. This thread will die')
+            break
         parsed_data = json.loads(json_data)
 
         # If the message client sent is quit(), then server kill the client in the clients,
@@ -100,6 +108,7 @@ def send_chat(conn):
         username = parsed_data['username']
         channel = parsed_data['channel']
         if message == 'quit()':
+            message = 'left'
             for client in clients:
                 if client['username'] == username:
 
@@ -113,7 +122,6 @@ def send_chat(conn):
                     client['socket'].close()
                     clients.remove(client)
                     print('current clients:', clients)
-            return
 
         # Send chat data to the all clients that share same channel except one who send the message
         data_to_send = {
